@@ -79,7 +79,7 @@ pub fn is_name(code: u8) -> bool {
 // A code point between U+0000 NULL and U+0008 BACKSPACE, or U+000B LINE TABULATION,
 // or a code point between U+000E SHIFT OUT and U+001F INFORMATION SEPARATOR ONE, or U+007F DELETE.
 pub fn is_non_printable(code: u8) -> bool {
-    (code >= 0x0000 && code <= 0x0008) || code == 0x000B || (code >= 0x000E && code <= 0x001F) || code == 0x007F
+    code <= 0x0008 || code == 0x000B || (code >= 0x000E && code <= 0x001F) || code == 0x007F
 }
 
 // § 4.3.8. Check if two code points are a valid escape
