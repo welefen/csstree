@@ -53,10 +53,6 @@ impl<'a> Tokenizer<'a> {
         self.position += step;
     }
     #[inline]
-    fn back(&mut self, step: usize) {
-        self.position -= step;
-    }
-    #[inline]
     fn slice_str(&self) -> &str {
         &self.input[self.offset..self.position]
     }
@@ -64,7 +60,7 @@ impl<'a> Tokenizer<'a> {
     fn slice_str_pos(&self, pos: usize) -> &str {
         &self.input[pos..self.position]
     }
-    pub fn nextToken(&mut self) -> Token {
+    pub fn next_token(&mut self) -> Token {
         if self.is_eof() {
             return Token::EOF;
         }
@@ -350,7 +346,6 @@ impl<'a> Tokenizer<'a> {
                 self.forward(1);
                 break;
             } else if is_newline(byte) {
-                self.back(1);
                 return Token::BadString(self.slice_str());
             } else if byte == b'\\' {
                 let next = self.next(1);

@@ -19,7 +19,7 @@ fn main() {
     let mut i = 0;
     while i < 10 {
         i += 1;
-        let token = instance.nextToken();
+        let token = instance.next_token();
         if let Token::EOF = token {
             break;
         }
