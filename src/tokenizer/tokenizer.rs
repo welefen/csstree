@@ -1,7 +1,7 @@
 use super::token::Token;
 use super::{
     is_digit, is_hex_digit, is_identifier, is_identifier_start, is_newline, is_non_printable,
-    is_valid_escape, is_whitespace, would_start_an_identifier, would_start_a_number
+    is_valid_escape, is_whitespace, would_start_a_number, would_start_an_identifier,
 };
 use std::str;
 
@@ -44,13 +44,24 @@ impl<'a> Tokenizer<'a> {
             self.input.as_bytes()[pos]
         }
     }
-    #[inline]
-    fn starts_with(&self, s: &str) -> bool {
-        self.input[self.position..].starts_with(s)
-    }
+    // #[inline]
+    // fn starts_with(&self, s: &str) -> bool {
+    //     self.input[self.position..].starts_with(s)
+    // }
     #[inline]
     fn forward(&mut self, step: usize) {
-        self.position += step;
+        let mut i = 1;
+        while i <= step {
+            i += 1;
+            self.position += 1;
+            let byte = self.byte();
+            if byte == b'\n' || (byte == b'\r' && self.next(1) != b'\n') {
+                self.line += 1;
+                self.column = 1;
+            } else {
+                self.column += 1;
+            }
+        }
     }
     #[inline]
     fn slice_str(&self) -> &'a str {
@@ -60,13 +71,14 @@ impl<'a> Tokenizer<'a> {
     fn slice_str_pos(&self, pos: usize) -> &'a str {
         &self.input[pos..self.position]
     }
+    /// get next token
     pub fn next_token(&mut self) -> Token<'a> {
         if self.is_eof() {
             return Token::EOF;
         }
         self.offset = self.position;
         let code = self.byte();
-        if self.starts_with("/*") {
+        if code == b'/' && self.next(1) == b'*' {
             return self.consume_comment();
         } else if is_whitespace(code) {
             return self.consume_whitespace();
@@ -157,7 +169,7 @@ impl<'a> Tokenizer<'a> {
         self.consume_identifier();
         let s = &self.input[pos..self.position];
         let url = "url";
-        if s.eq_ignore_ascii_case("url") {
+        if s.eq_ignore_ascii_case(url) {
             if self.byte() == b'(' {
                 self.forward(1);
             }
@@ -193,7 +205,7 @@ impl<'a> Tokenizer<'a> {
             } else if byte == b'"' || byte == b'\'' || byte == b'(' || is_non_printable(byte) {
                 self.consume_bad_url_remnants();
                 return Token::BadUrl(self.slice_str_pos(pos));
-            } else  if byte == b'\\' {
+            } else if byte == b'\\' {
                 if is_valid_escape(byte, self.next(1)) {
                     self.consume_escaped();
                 } else {
@@ -321,7 +333,7 @@ impl<'a> Tokenizer<'a> {
     fn consume_comment(&mut self) -> Token<'a> {
         self.forward(2);
         while !self.is_eof() {
-            if self.starts_with("*/") {
+            if self.byte() == b'*' && self.next(1) == b'/' {
                 self.forward(2);
                 break;
             }

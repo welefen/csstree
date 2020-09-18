@@ -1,41 +1,43 @@
-// mod tokenizer;
 mod tokenizer;
-use std::str;
+use std::fs;
 
-use std::time::{Duration, Instant};
+use std::time::Instant;
 use tokenizer::token::Token;
 use tokenizer::tokenizer::Tokenizer;
 
-// use crate::tokenizer::tokenizer;
-fn main() {
-    let start = Instant::now();
-    let a = r"#id url('fasdf')";
-    // a.chars();
-    //(189 & !0b0011_1111) == 0b1000_0000
-    // let mut b = String::from(&a[0..4]);
-    // println!("www{:?}", b);
-    let mut instance = Tokenizer::new(a);
-    let c: u8 = b'a';
-    let mut i = 0;
-    while i < 10 {
-        i += 1;
+
+
+fn token_by_csstree(content: &str) {
+    let mut instance = Tokenizer::new(content);
+    loop {
         let token = instance.next_token();
         if let Token::EOF = token {
             break;
+        } else {
+            // arr.push(token);
         }
-        println!("{:?}", token);
+        // println!("{:?}", token);
     }
-    // let f = a.starts_with("0x61");
-    // println!("{:?}", f);
-    // let mut i = 0;
-    // while i < 10000000 {
-    //     let b = a;
-    //     // b = b + "s";
-    //     i += 1;
-    //     // a.chars().next();
-    // }
+}
 
+// use cssparser::Tokenizer;
+// fn token_by_cssparser(content: &str) {
+//     let mut instance = Tokenizer::new(content);
+//     loop {
+//         let token = instance.next();
+//         match token {
+//             Ok(t) => (),
+//             Err(e) => break
+//         }
+//     }
+// }
+
+fn main() {
+    let content = fs::read_to_string("./files/1.css").expect("");
+    // let content = r"/***/";
+    let start = Instant::now();
+    token_by_csstree(&content);
     let duration = start.elapsed();
 
-    println!("Time elapsed in expensive_function() is: {:?}", c);
+    println!("Time elapsed in expensive_function() is: {:?}", duration);
 }
