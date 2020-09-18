@@ -53,24 +53,22 @@ impl<'a> Tokenizer<'a> {
         self.position += step;
     }
     #[inline]
-    fn slice_str(&self) -> &str {
+    fn slice_str(&self) -> &'a str {
         &self.input[self.offset..self.position]
     }
     #[inline]
-    fn slice_str_pos(&self, pos: usize) -> &str {
+    fn slice_str_pos(&self, pos: usize) -> &'a str {
         &self.input[pos..self.position]
     }
-    pub fn next_token(&mut self) -> Token {
+    pub fn next_token(&mut self) -> Token<'a> {
         if self.is_eof() {
             return Token::EOF;
         }
         self.offset = self.position;
-        let pos = self.position;
+        let code = self.byte();
         if self.starts_with("/*") {
             return self.consume_comment();
-        }
-        let code = self.byte();
-        if is_whitespace(code) {
+        } else if is_whitespace(code) {
             return self.consume_whitespace();
         } else if is_digit(code) {
             return self.consume_numberic();
@@ -101,7 +99,7 @@ impl<'a> Tokenizer<'a> {
             }
         }
     }
-    fn consume_reverse_solidus(&mut self) -> Token {
+    fn consume_reverse_solidus(&mut self) -> Token<'a> {
         let byte = self.byte();
         if is_valid_escape(byte, self.next(1)) {
             return self.consume_ident_like();
@@ -109,7 +107,7 @@ impl<'a> Tokenizer<'a> {
         self.forward(1);
         Token::Delim(self.slice_str())
     }
-    fn consume_at(&mut self) -> Token {
+    fn consume_at(&mut self) -> Token<'a> {
         self.forward(1);
         if would_start_an_identifier(self.byte(), self.next(1), self.next(2)) {
             self.consume_identifier();
@@ -117,7 +115,7 @@ impl<'a> Tokenizer<'a> {
         }
         Token::Delim(self.slice_str())
     }
-    fn consume_less_than(&mut self) -> Token {
+    fn consume_less_than(&mut self) -> Token<'a> {
         self.forward(1);
         // <!--
         if self.byte() == b'!' && self.next(1) == b'-' && self.next(2) == b'-' {
@@ -126,7 +124,7 @@ impl<'a> Tokenizer<'a> {
         }
         Token::Delim(self.slice_str())
     }
-    fn consume_full_stop(&mut self) -> Token {
+    fn consume_full_stop(&mut self) -> Token<'a> {
         let byte = self.byte();
         if would_start_a_number(byte, self.next(1), self.next(2)) {
             return self.consume_numberic();
@@ -134,7 +132,7 @@ impl<'a> Tokenizer<'a> {
         self.forward(1);
         Token::Delim(self.slice_str())
     }
-    fn consume_hyphen_minus(&mut self) -> Token {
+    fn consume_hyphen_minus(&mut self) -> Token<'a> {
         let byte = self.byte();
         let next1 = self.next(1);
         let next2 = self.next(2);
@@ -154,7 +152,7 @@ impl<'a> Tokenizer<'a> {
         return Token::Delim(self.slice_str());
     }
     // https://drafts.csswg.org/css-syntax/#consume-ident-like-token
-    fn consume_ident_like(&mut self) -> Token {
+    fn consume_ident_like(&mut self) -> Token<'a> {
         let pos = self.position;
         self.consume_identifier();
         let s = &self.input[pos..self.position];
@@ -177,7 +175,7 @@ impl<'a> Tokenizer<'a> {
         return Token::Ident(s);
     }
     // https://drafts.csswg.org/css-syntax/#consume-a-url-token
-    fn consume_url(&mut self) -> Token {
+    fn consume_url(&mut self) -> Token<'a> {
         self.forward_to_whitespace_end();
         let pos = self.position;
         while !self.is_eof() {
@@ -222,7 +220,7 @@ impl<'a> Tokenizer<'a> {
             }
         }
     }
-    fn consume_plus_sign(&mut self) -> Token {
+    fn consume_plus_sign(&mut self) -> Token<'a> {
         if would_start_a_number(self.byte(), self.next(1), self.next(2)) {
             return self.consume_numberic();
         }
@@ -271,7 +269,7 @@ impl<'a> Tokenizer<'a> {
         }
     }
     // https://drafts.csswg.org/css-syntax/#consume-a-numeric-token
-    fn consume_numberic(&mut self) -> Token {
+    fn consume_numberic(&mut self) -> Token<'a> {
         self.consume_number();
         let byte = self.byte();
         if would_start_an_identifier(byte, self.next(1), self.next(2)) {
@@ -284,12 +282,12 @@ impl<'a> Tokenizer<'a> {
             Token::Number(self.slice_str())
         }
     }
-    fn consume_simple(&mut self, t: Token<'a>) -> Token {
+    fn consume_simple(&mut self, t: Token<'a>) -> Token<'a> {
         self.forward(1);
         t
     }
     // https://drafts.csswg.org/css-syntax/#consume-token
-    fn consume_hash(&mut self) -> Token {
+    fn consume_hash(&mut self) -> Token<'a> {
         self.forward(1);
         let byte = self.byte();
         if is_identifier(byte) || is_valid_escape(byte, self.next(1)) {
@@ -320,7 +318,7 @@ impl<'a> Tokenizer<'a> {
         }
     }
     // https://drafts.csswg.org/css-syntax/#consume-comments
-    fn consume_comment(&mut self) -> Token {
+    fn consume_comment(&mut self) -> Token<'a> {
         self.forward(2);
         while !self.is_eof() {
             if self.starts_with("*/") {
@@ -332,12 +330,12 @@ impl<'a> Tokenizer<'a> {
         Token::Comment(self.slice_str())
     }
     // https://drafts.csswg.org/css-syntax/#whitespace
-    fn consume_whitespace(&mut self) -> Token {
+    fn consume_whitespace(&mut self) -> Token<'a> {
         self.forward_to_whitespace_end();
         Token::WhiteSpace(self.slice_str())
     }
     // https://drafts.csswg.org/css-syntax/#consume-a-string-token
-    fn consume_string(&mut self) -> Token {
+    fn consume_string(&mut self) -> Token<'a> {
         let s = self.byte();
         self.forward(1);
         while !self.is_eof() {

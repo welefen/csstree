@@ -26,7 +26,4 @@ pub enum Token<'a> {
     LeftCurlyBracket,      // <{-token>
     RightCurlyBracket,     // <}-token>
     Comment(&'a str),      // <comment-token>
-    And,                   // <&-token>
-    TypeSelector(&'a str), // type selector
-    IdSelector(&'a str),   // id selector
 }

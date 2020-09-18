@@ -87,3 +87,8 @@ pub fn would_start_a_number(first: u8, second: u8, third: u8) -> bool {
     }
     return is_digit(first);
 }
+
+// pub fn preprocessing(input: &str) {
+//     let s = String::from(input);
+//     s.remove(0);
+// }
