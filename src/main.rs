@@ -9,7 +9,7 @@ use tokenizer::tokenizer::Tokenizer;
 // use crate::tokenizer::tokenizer;
 fn main() {
     let start = Instant::now();
-    let a = "\"23af\"";
+    let a = r"#id url('fasdf')";
     // a.chars();
     //(189 & !0b0011_1111) == 0b1000_0000
     // let mut b = String::from(&a[0..4]);

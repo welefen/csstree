@@ -62,3 +62,28 @@ pub fn is_valid_escape(first: u8, second: u8) -> bool {
     }
     true
 }
+
+// https://drafts.csswg.org/css-syntax/#would-start-an-identifier
+pub fn would_start_an_identifier(first: u8, second: u8, third: u8) -> bool {
+    // U+002D HYPHEN-MINUS
+    if first == b'-' {
+        is_identifier_start(second) || second == b'-' || is_valid_escape(second, third)
+    } else if is_identifier_start(first) {
+        true
+    } else if first == b'\\' {
+        is_valid_escape(first, second)
+    } else {
+        false
+    }
+}
+
+// https://drafts.csswg.org/css-syntax/#starts-with-a-number
+pub fn would_start_a_number(first: u8, second: u8, third: u8) -> bool {
+    if first == b'+' || first == b'-' {
+        return is_digit(second) || (second == b'.' && is_digit(third));
+    }
+    if first == b'.' {
+       return is_digit(second);
+    }
+    return is_digit(first);
+}
