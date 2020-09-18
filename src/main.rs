@@ -34,6 +34,7 @@ fn token_by_csstree(content: &str) {
 
 fn main() {
     let content = fs::read_to_string("./files/1.css").expect("");
+    // content.chars();
     // let content = r"/***/";
     let start = Instant::now();
     token_by_csstree(&content);

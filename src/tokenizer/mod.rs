@@ -88,6 +88,10 @@ pub fn would_start_a_number(first: u8, second: u8, third: u8) -> bool {
     return is_digit(first);
 }
 
+pub fn utf8_is_cont_byte(byte: u8) -> bool {
+    (byte & !0b0011_1111) == 0b1000_0000
+}
+
 // pub fn preprocessing(input: &str) {
 //     let s = String::from(input);
 //     s.remove(0);
