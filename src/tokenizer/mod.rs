@@ -2,7 +2,6 @@ pub mod source_location;
 pub mod token;
 pub mod tokenizer;
 
-// https://drafts.csswg.org/css-syntax-3/
 
 // A code point between U+0030 DIGIT ZERO (0) and U+0039 DIGIT NINE (9) inclusive.
 #[inline]
@@ -94,7 +93,7 @@ pub fn would_start_a_number(first: u8, second: u8, third: u8) -> bool {
     if first == b'.' {
        return is_digit(second);
     }
-    return is_digit(first);
+    is_digit(first)
 }
 
 #[inline]

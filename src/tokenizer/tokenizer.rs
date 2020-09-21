@@ -3,7 +3,6 @@ use super::{
     is_digit, is_hex_digit, is_identifier, is_identifier_start, is_newline, is_non_printable,
     is_valid_escape, is_whitespace, would_start_a_number, would_start_an_identifier, utf8_is_cont_byte,
 };
-use std::str;
 
 pub struct Tokenizer<'a> {
     input: &'a str,
