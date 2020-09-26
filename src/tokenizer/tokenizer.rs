@@ -8,8 +8,8 @@ pub struct Tokenizer<'a> {
     input: &'a str,
     position: usize,
     offset: usize,
-    line: usize,
-    column: usize,
+    pub line: usize,
+    pub column: usize,
 }
 
 impl<'a> Tokenizer<'a> {
